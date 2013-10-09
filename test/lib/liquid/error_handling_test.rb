@@ -24,7 +24,7 @@ class ErrorHandlingTest < Test::Unit::TestCase
 
   def test_standard_error
     assert_nothing_raised do
-      template = Liquid::Template.parse( ' {{ errors.standard_error }} '  )
+      template = Liquid::Template.parse(' {{ errors.standard_error }} ')
       assert_equal ' Liquid error: standard error ', template.render('errors' => ErrorDrop.new)
 
       assert_equal 1, template.errors.size
@@ -36,7 +36,7 @@ class ErrorHandlingTest < Test::Unit::TestCase
 
     assert_nothing_raised do
 
-      template = Liquid::Template.parse( ' {{ errors.syntax_error }} '  )
+      template = Liquid::Template.parse(' {{ errors.syntax_error }} ')
       assert_equal ' Liquid syntax error: syntax error ', template.render('errors' => ErrorDrop.new)
 
       assert_equal 1, template.errors.size
@@ -48,7 +48,7 @@ class ErrorHandlingTest < Test::Unit::TestCase
   def test_argument
     assert_nothing_raised do
 
-      template = Liquid::Template.parse( ' {{ errors.argument_error }} '  )
+      template = Liquid::Template.parse(' {{ errors.argument_error }} ')
       assert_equal ' Liquid error: argument error ', template.render('errors' => ErrorDrop.new)
 
       assert_equal 1, template.errors.size
@@ -74,7 +74,7 @@ class ErrorHandlingTest < Test::Unit::TestCase
   # Liquid should not catch Exceptions that are not subclasses of StandardError, like Interrupt and NoMemoryError
   def test_exceptions_propagate
     assert_raise Exception do
-      template = Liquid::Template.parse( ' {{ errors.exception }} '  )
+      template = Liquid::Template.parse(' {{ errors.exception }} ')
       template.render('errors' => ErrorDrop.new)
     end
   end

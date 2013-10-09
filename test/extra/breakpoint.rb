@@ -113,7 +113,7 @@ module Breakpoint
     file, line, method = *callstack.first.match(/^(.+?):(\d+)(?::in `(.*?)')?/).captures
 
     message = "Executing break point " + (id ? "#{id.inspect} " : "") +
-              "at #{file}:#{line}" + (method ? " in `#{method}'" : "")
+        "at #{file}:#{line}" + (method ? " in `#{method}'" : "")
 
     if context then
       return handle_breakpoint(context, message, file, line, &block)
@@ -302,7 +302,8 @@ module Breakpoint
       @collision_handler.call
     end
 
-    def ping() end
+    def ping()
+    end
 
     def add_breakpoint(context, message)
       workspace = IRB::WorkSpace.new(context)
@@ -313,7 +314,7 @@ module Breakpoint
       @handler.untaint
       @handler.call(workspace, message)
     rescue Errno::ECONNREFUSED, DRb::DRbConnError
-      raise if Breakpoint.use_drb? 
+      raise if Breakpoint.use_drb?
     end
 
     attr_accessor :handler, :eval_handler, :collision_handler
@@ -372,7 +373,7 @@ module Breakpoint
   # <code>Breakpoint.activate_drb('drbunix:/tmp/breakpoint_server')</code>. This
   # will only work on Unix based platforms.
   def activate_drb(uri = nil, allowed_hosts = ['localhost', '127.0.0.1', '::1'],
-    ignore_collisions = false)
+      ignore_collisions = false)
 
     return false if @use_drb
 
@@ -432,7 +433,10 @@ module Breakpoint
 end
 
 module IRB # :nodoc:
-  class << self; remove_method :start; end
+  class << self;
+    remove_method :start;
+  end
+
   def self.start(ap_path = nil, main_context = nil, workspace = nil)
     $0 = File::basename(ap_path, ".rb") if ap_path
 
@@ -461,7 +465,7 @@ module IRB # :nodoc:
         # ignored
       end
     end
-    
+
     catch(:IRB_EXIT) do
       irb.eval_input
     end
@@ -478,16 +482,22 @@ module IRB # :nodoc:
   def IRB.CurrentContext
     if old_CurrentContext.nil? and Breakpoint.use_drb? then
       result = Object.new
-      def result.last_value; end
+
+      def result.last_value;
+      end
+
       return result
     else
       old_CurrentContext
     end
   end
-  def IRB.parse_opts() end
+
+  def IRB.parse_opts()
+  end
 
   class Context # :nodoc:
     alias :old_evaluate :evaluate
+
     def evaluate(line, line_no)
       if line.chomp == "exit" then
         exit
@@ -504,7 +514,7 @@ module IRB # :nodoc:
       if Breakpoint.use_drb? then
         result = old_evaluate(*args)
         if args[0] != :no_proxy and
-          not [true, false, nil].include?(result)
+            not [true, false, nil].include?(result)
         then
           result.extend(DRbUndumped) rescue nil
         end

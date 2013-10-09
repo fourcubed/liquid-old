@@ -39,18 +39,18 @@ module Liquid
         collection.each_with_index do |item, index|
           context[@variable_name] = item
           context['tablerowloop'] = {
-            'length'  => length,
-            'index'   => index + 1,
-            'index0'  => index,
-            'col'     => col + 1,
-            'col0'    => col,
-            'index0'  => index,
-            'rindex'  => length - index,
-            'rindex0' => length - index -1,
-            'first'   => (index == 0),
-            'last'    => (index == length - 1),
-            'col_first' => (col == 0),
-            'col_last'  => (col == cols - 1)
+              'length' => length,
+              'index' => index + 1,
+              'index0' => index,
+              'col' => col + 1,
+              'col0' => col,
+              'index0' => index,
+              'rindex' => length - index,
+              'rindex0' => length - index -1,
+              'first' => (index == 0),
+              'last' => (index == length - 1),
+              'col_first' => (col == 0),
+              'col_last' => (col == cols - 1)
           }
 
 
@@ -59,7 +59,7 @@ module Liquid
           result << "<td class=\"col#{col}\">" << render_all(@nodelist, context) << '</td>'
 
           if col == cols and not (index == length - 1)
-            col  = 0
+            col = 0
             row += 1
             result << "</tr>\n<tr class=\"row#{row}\">"
           end

@@ -45,32 +45,32 @@ module Liquid
 
     private
 
-      def push_block(tag, markup)
-        block = if tag == 'else'
-          ElseCondition.new
-        else
+    def push_block(tag, markup)
+      block = if tag == 'else'
+                ElseCondition.new
+              else
 
-          expressions = markup.scan(ExpressionsAndOperators).reverse
-          raise(SyntaxError, SyntaxHelp) unless expressions.shift =~ Syntax
+                expressions = markup.scan(ExpressionsAndOperators).reverse
+                raise(SyntaxError, SyntaxHelp) unless expressions.shift =~ Syntax
 
-          condition = Condition.new($1, $2, $3)
+                condition = Condition.new($1, $2, $3)
 
-          while not expressions.empty?
-            operator = (expressions.shift).to_s.strip
+                while not expressions.empty?
+                  operator = (expressions.shift).to_s.strip
 
-            raise(SyntaxError, SyntaxHelp) unless expressions.shift.to_s =~ Syntax
+                  raise(SyntaxError, SyntaxHelp) unless expressions.shift.to_s =~ Syntax
 
-            new_condition = Condition.new($1, $2, $3)
-            new_condition.send(operator.to_sym, condition)
-            condition = new_condition
-          end
+                  new_condition = Condition.new($1, $2, $3)
+                  new_condition.send(operator.to_sym, condition)
+                  condition = new_condition
+                end
 
-          condition
-        end
+                condition
+              end
 
-        @blocks.push(block)
-        @nodelist = block.attach(Array.new)
-      end
+      @blocks.push(block)
+      @nodelist = block.attach(Array.new)
+    end
 
 
   end

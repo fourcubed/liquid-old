@@ -52,18 +52,18 @@ class FiltersTest < Test::Unit::TestCase
   end
 
   def test_join
-    @context['var'] = [1,2,3,4]
+    @context['var'] = [1, 2, 3, 4]
 
     assert_equal "1 2 3 4", Variable.new("var | join").render(@context)
   end
 
   def test_sort
     @context['value'] = 3
-    @context['numbers'] = [2,1,4,3]
+    @context['numbers'] = [2, 1, 4, 3]
     @context['words'] = ['expected', 'as', 'alphabetic']
     @context['arrays'] = [['flattened'], ['are']]
 
-    assert_equal [1,2,3,4], Variable.new("numbers | sort").render(@context)
+    assert_equal [1, 2, 3, 4], Variable.new("numbers | sort").render(@context)
     assert_equal ['alphabetic', 'as', 'expected'], Variable.new("words | sort").render(@context)
     assert_equal [3], Variable.new("value | sort").render(@context)
     assert_equal ['are', 'flattened'], Variable.new("arrays | sort").render(@context)

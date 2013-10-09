@@ -51,6 +51,7 @@ class Module
       def initialize(object)
         @object = object
       end
+
       allowed_methods.each do |sym|
         define_method sym do
           @object.send sym

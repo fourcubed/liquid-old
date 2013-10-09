@@ -3,10 +3,10 @@ require 'set'
 module Liquid
 
   parent_object = if defined? BlankObject
-    BlankObject
-  else
-    Object
-  end
+                    BlankObject
+                  else
+                    Object
+                  end
 
   # Strainer is the parent class for the filters system.
   # New filters are mixed into the strainer class which is then instanciated for each liquid template render run.
@@ -32,7 +32,7 @@ module Liquid
 
     def self.create(context)
       strainer = Strainer.new(context)
-      @@filters.each { |k,m| strainer.extend(m) }
+      @@filters.each { |k, m| strainer.extend(m) }
       strainer
     end
 

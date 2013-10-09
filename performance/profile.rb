@@ -6,7 +6,7 @@ profiler = ThemeRunner.new
 
 puts 'Running profiler...'
 
-results  = profiler.run(true)
+results = profiler.run(true)
 
 puts 'Success'
 puts

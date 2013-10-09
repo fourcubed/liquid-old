@@ -12,7 +12,7 @@ class StandardFiltersTest < Test::Unit::TestCase
   end
 
   def test_size
-    assert_equal 3, @filters.size([1,2,3])
+    assert_equal 3, @filters.size([1, 2, 3])
     assert_equal 0, @filters.size([])
     assert_equal 0, @filters.size(nil)
   end
@@ -63,19 +63,19 @@ class StandardFiltersTest < Test::Unit::TestCase
   end
 
   def test_join
-    assert_equal '1 2 3 4', @filters.join([1,2,3,4])
-    assert_equal '1 - 2 - 3 - 4', @filters.join([1,2,3,4], ' - ')
+    assert_equal '1 2 3 4', @filters.join([1, 2, 3, 4])
+    assert_equal '1 - 2 - 3 - 4', @filters.join([1, 2, 3, 4], ' - ')
   end
 
   def test_sort
-    assert_equal [1,2,3,4], @filters.sort([4,3,2,1])
+    assert_equal [1, 2, 3, 4], @filters.sort([4, 3, 2, 1])
     assert_equal [{"a" => 1}, {"a" => 2}, {"a" => 3}, {"a" => 4}], @filters.sort([{"a" => 4}, {"a" => 3}, {"a" => 1}, {"a" => 2}], "a")
   end
 
   def test_map
-    assert_equal [1,2,3,4], @filters.map([{"a" => 1}, {"a" => 2}, {"a" => 3}, {"a" => 4}], 'a')
+    assert_equal [1, 2, 3, 4], @filters.map([{"a" => 1}, {"a" => 2}, {"a" => 3}, {"a" => 4}], 'a')
     assert_template_result 'abc', "{{ ary | map:'foo' | map:'bar' }}",
-      'ary' => [{'foo' => {'bar' => 'a'}}, {'foo' => {'bar' => 'b'}}, {'foo' => {'bar' => 'c'}}]
+                           'ary' => [{'foo' => {'bar' => 'a'}}, {'foo' => {'bar' => 'b'}}, {'foo' => {'bar' => 'c'}}]
   end
 
   def test_date
@@ -101,8 +101,8 @@ class StandardFiltersTest < Test::Unit::TestCase
 
 
   def test_first_last
-    assert_equal 1, @filters.first([1,2,3])
-    assert_equal 3, @filters.last([1,2,3])
+    assert_equal 1, @filters.first([1, 2, 3])
+    assert_equal 3, @filters.last([1, 2, 3])
     assert_equal nil, @filters.first([])
     assert_equal nil, @filters.last([])
   end
@@ -163,18 +163,18 @@ class StandardFiltersTest < Test::Unit::TestCase
   end
 
   def test_append
-    assigns = {'a' => 'bc', 'b' => 'd' }
-    assert_template_result('bcd',"{{ a | append: 'd'}}",assigns)
-    assert_template_result('bcd',"{{ a | append: b}}",assigns)
+    assigns = {'a' => 'bc', 'b' => 'd'}
+    assert_template_result('bcd', "{{ a | append: 'd'}}", assigns)
+    assert_template_result('bcd', "{{ a | append: b}}", assigns)
   end
 
   def test_prepend
-    assigns = {'a' => 'bc', 'b' => 'a' }
-    assert_template_result('abc',"{{ a | prepend: 'a'}}",assigns)
-    assert_template_result('abc',"{{ a | prepend: b}}",assigns)
+    assigns = {'a' => 'bc', 'b' => 'a'}
+    assert_template_result('abc', "{{ a | prepend: 'a'}}", assigns)
+    assert_template_result('abc', "{{ a | prepend: b}}", assigns)
   end
 
   def test_cannot_access_private_methods
-    assert_template_result('a',"{{ 'a' | to_number }}")
+    assert_template_result('a', "{{ 'a' | to_number }}")
   end
 end # StandardFiltersTest

@@ -32,9 +32,9 @@ class OutputTest < Test::Unit::TestCase
 
   def setup
     @assigns = {
-      'best_cars' => 'bmw',
-      'car' => {'bmw' => 'good', 'gm' => 'bad'}
-      }
+        'best_cars' => 'bmw',
+        'car' => {'bmw' => 'good', 'gm' => 'bad'}
+    }
   end
 
   def test_variable
@@ -49,7 +49,7 @@ class OutputTest < Test::Unit::TestCase
 
     expected = %| good bad good |
     assert_equal expected, Template.parse(text).render(@assigns)
-  end               
+  end
 
   def test_variable_piping
     text = %( {{ car.gm | make_funny }} )

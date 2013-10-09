@@ -5,13 +5,13 @@ class FileSystemTest < Test::Unit::TestCase
 
   def test_default
     assert_raise(FileSystemError) do
-      BlankFileSystem.new.read_template_file("dummy", {'dummy'=>'smarty'})
+      BlankFileSystem.new.read_template_file("dummy", {'dummy' => 'smarty'})
     end
   end
 
   def test_local
     file_system = Liquid::LocalFileSystem.new("/some/path")
-    assert_equal "/some/path/_mypartial.liquid"    , file_system.full_path("mypartial")
+    assert_equal "/some/path/_mypartial.liquid", file_system.full_path("mypartial")
     assert_equal "/some/path/dir/_mypartial.liquid", file_system.full_path("dir/mypartial")
 
     assert_raise(FileSystemError) do

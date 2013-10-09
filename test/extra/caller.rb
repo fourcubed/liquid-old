@@ -1,37 +1,38 @@
 class Continuation # :nodoc:
   def self.create(*args, &block) # :nodoc:
-    cc = nil; result = callcc {|c| cc = c; block.call(cc) if block and args.empty?}
+    cc = nil; result = callcc { |c| cc = c; block.call(cc) if block and args.empty? }
     result ||= args
     return *[cc, *result]
   end
 end
 
-class Binding; end # for RDoc
-# This method returns the binding of the method that called your
-# method. It will raise an Exception when you're not inside a method.
-#
-# It's used like this:
-#   def inc_counter(amount = 1)
-#     Binding.of_caller do |binding|
-#       # Create a lambda that will increase the variable 'counter'
-#       # in the caller of this method when called.
-#       inc = eval("lambda { |arg| counter += arg }", binding)
-#       # We can refer to amount from inside this block safely.
-#       inc.call(amount)
-#     end
-#     # No other statements can go here. Put them inside the block.
-#   end
-#   counter = 0
-#   2.times { inc_counter }
-#   counter # => 2
-#
-# Binding.of_caller must be the last statement in the method.
-# This means that you will have to put everything you want to
-# do after the call to Binding.of_caller into the block of it.
-# This should be no problem however, because Ruby has closures.
-# If you don't do this an Exception will be raised. Because of
-# the way that Binding.of_caller is implemented it has to be
-# done this way.
+class Binding;
+end # for RDoc
+    # This method returns the binding of the method that called your
+    # method. It will raise an Exception when you're not inside a method.
+    #
+    # It's used like this:
+    #   def inc_counter(amount = 1)
+    #     Binding.of_caller do |binding|
+    #       # Create a lambda that will increase the variable 'counter'
+    #       # in the caller of this method when called.
+    #       inc = eval("lambda { |arg| counter += arg }", binding)
+    #       # We can refer to amount from inside this block safely.
+    #       inc.call(amount)
+    #     end
+    #     # No other statements can go here. Put them inside the block.
+    #   end
+    #   counter = 0
+    #   2.times { inc_counter }
+    #   counter # => 2
+    #
+    # Binding.of_caller must be the last statement in the method.
+    # This means that you will have to put everything you want to
+    # do after the call to Binding.of_caller into the block of it.
+    # This should be no problem however, because Ruby has closures.
+    # If you don't do this an Exception will be raised. Because of
+    # the way that Binding.of_caller is implemented it has to be
+    # done this way.
 def Binding.of_caller(&block)
   old_critical = Thread.critical
   Thread.critical = true
@@ -62,7 +63,7 @@ def Binding.of_caller(&block)
     else
       set_trace_func(nil)
       error_msg = "Binding.of_caller used in non-method context or " +
-        "trailing statements of method using it aren't in the block."
+          "trailing statements of method using it aren't in the block."
       cc.call(nil, lambda { raise(ArgumentError, error_msg) }, nil)
     end
   end
@@ -73,8 +74,10 @@ def Binding.of_caller(&block)
   else
     Thread.critical = old_critical
     case block.arity
-      when 1 then yield(result)
-      else yield(result, extra_data)        
+      when 1 then
+        yield(result)
+      else
+        yield(result, extra_data)
     end
   end
 end

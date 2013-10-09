@@ -24,10 +24,10 @@ task :release => :gem do
   sh "gem push pkg/liquid-#{gemspec.version}.gem"
 end
 
-namespace :benchmark do 
+namespace :benchmark do
 
   desc "Run the liquid benchmark"
-  task :run do 
+  task :run do
     ruby "performance/benchmark.rb"
   end
 end
@@ -43,7 +43,7 @@ namespace :profile do
   end
 
   desc "Run KCacheGrind"
-  task :grind => :run  do
+  task :grind => :run do
     system "kcachegrind /tmp/liquid.rubyprof_calltreeprinter.txt"
   end
 

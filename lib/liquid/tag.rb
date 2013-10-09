@@ -5,8 +5,8 @@ module Liquid
     attr_accessor :nodelist
 
     def initialize(tag_name, markup, tokens)
-      @tag_name   = tag_name
-      @markup     = markup
+      @tag_name = tag_name
+      @markup = markup
       parse(tokens)
     end
 

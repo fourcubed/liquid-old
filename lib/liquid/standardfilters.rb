@@ -37,14 +37,18 @@ module Liquid
 
     # Truncate a string down to x characters
     def truncate(input, length = 50, truncate_string = "...")
-      if input.nil? then return end
+      if input.nil? then
+        return
+      end
       l = length.to_i - truncate_string.length
       l = 0 if l < 0
       input.length > length.to_i ? input[0...l] + truncate_string : input
     end
 
     def truncatewords(input, words = 15, truncate_string = "...")
-      if input.nil? then return end
+      if input.nil? then
+        return
+      end
       wordlist = input.to_s.split
       l = words.to_i - 1
       l = 0 if l < 0
@@ -73,9 +77,9 @@ module Liquid
       if property.nil?
         ary.sort
       elsif ary.first.respond_to?('[]') and !ary.first[property].nil?
-        ary.sort {|a,b| a[property] <=> b[property] }
+        ary.sort { |a, b| a[property] <=> b[property] }
       elsif ary.first.respond_to?(property)
-        ary.sort {|a,b| a.send(property) <=> b.send(property) }
+        ary.sort { |a, b| a.send(property) <=> b.send(property) }
       end
     end
 
@@ -83,9 +87,9 @@ module Liquid
     def map(input, property)
       ary = [input].flatten
       if ary.first.respond_to?('[]') and !ary.first[property].nil?
-        ary.map {|e| e[property] }
+        ary.map { |e| e[property] }
       elsif ary.first.respond_to?(property)
-        ary.map {|e| e.send(property) }
+        ary.map { |e| e.send(property) }
       end
     end
 
@@ -209,16 +213,16 @@ module Liquid
 
     private
 
-      def to_number(obj)
-        case obj
+    def to_number(obj)
+      case obj
         when Numeric
           obj
         when String
           (obj.strip =~ /^\d+\.\d+$/) ? obj.to_f : obj.to_i
         else
           0
-        end
       end
+    end
 
   end
 

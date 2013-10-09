@@ -36,6 +36,7 @@ end
 
 class CategoryDrop
   attr_accessor :category, :context
+
   def initialize(category)
     @category = category
   end
@@ -121,15 +122,15 @@ class ContextTest < Test::Unit::TestCase
 
   def test_length_query
 
-    @context['numbers'] = [1,2,3,4]
+    @context['numbers'] = [1, 2, 3, 4]
 
     assert_equal 4, @context['numbers.size']
 
-    @context['numbers'] = {1 => 1,2 => 2,3 => 3,4 => 4}
+    @context['numbers'] = {1 => 1, 2 => 2, 3 => 3, 4 => 4}
 
     assert_equal 4, @context['numbers.size']
 
-    @context['numbers'] = {1 => 1,2 => 2,3 => 3,4 => 4, 'size' => 1000}
+    @context['numbers'] = {1 => 1, 2 => 2, 3 => 3, 4 => 4, 'size' => 1000}
 
     assert_equal 1000, @context['numbers.size']
 
@@ -233,15 +234,15 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_merge
-    @context.merge({ "test" => "test" })
+    @context.merge({"test" => "test"})
     assert_equal 'test', @context['test']
-    @context.merge({ "test" => "newvalue", "foo" => "bar" })
+    @context.merge({"test" => "newvalue", "foo" => "bar"})
     assert_equal 'newvalue', @context['test']
     assert_equal 'bar', @context['foo']
   end
 
   def test_array_notation
-    @context['test'] = [1,2,3,4,5]
+    @context['test'] = [1, 2, 3, 4, 5]
 
     assert_equal 1, @context['test[0]']
     assert_equal 2, @context['test[1]']
@@ -251,7 +252,7 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_recoursive_array_notation
-    @context['test'] = {'test' => [1,2,3,4,5]}
+    @context['test'] = {'test' => [1, 2, 3, 4, 5]}
 
     assert_equal 1, @context['test.test[0]']
 
@@ -262,10 +263,10 @@ class ContextTest < Test::Unit::TestCase
 
   def test_hash_to_array_transition
     @context['colors'] = {
-      'Blue'    => ['003366','336699', '6699CC', '99CCFF'],
-      'Green'   => ['003300','336633', '669966', '99CC99'],
-      'Yellow'  => ['CC9900','FFCC00', 'FFFF99', 'FFFFCC'],
-      'Red'     => ['660000','993333', 'CC6666', 'FF9999']
+        'Blue' => ['003366', '336699', '6699CC', '99CCFF'],
+        'Green' => ['003300', '336633', '669966', '99CC99'],
+        'Yellow' => ['CC9900', 'FFCC00', 'FFFF99', 'FFFFCC'],
+        'Red' => ['660000', '993333', 'CC6666', 'FF9999']
     }
 
     assert_equal '003366', @context['colors.Blue[0]']
@@ -273,12 +274,12 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_try_first
-    @context['test'] = [1,2,3,4,5]
+    @context['test'] = [1, 2, 3, 4, 5]
 
     assert_equal 1, @context['test.first']
     assert_equal 5, @context['test.last']
 
-    @context['test'] = {'test' => [1,2,3,4,5]}
+    @context['test'] = {'test' => [1, 2, 3, 4, 5]}
 
     assert_equal 1, @context['test.test.first']
     assert_equal 5, @context['test.test.last']
@@ -289,8 +290,8 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_access_hashes_with_hash_notation
-    @context['products'] = {'count' => 5, 'tags' => ['deepsnow', 'freestyle'] }
-    @context['product'] = {'variants' => [ {'title' => 'draft151cm'}, {'title' => 'element151cm'}  ]}
+    @context['products'] = {'count' => 5, 'tags' => ['deepsnow', 'freestyle']}
+    @context['product'] = {'variants' => [{'title' => 'draft151cm'}, {'title' => 'element151cm'}]}
 
     assert_equal 5, @context['products["count"]']
     assert_equal 'deepsnow', @context['products["tags"][0]']
@@ -313,14 +314,14 @@ class ContextTest < Test::Unit::TestCase
 
     @context['var'] = 'tags'
     @context['nested'] = {'var' => 'tags'}
-    @context['products'] = {'count' => 5, 'tags' => ['deepsnow', 'freestyle'] }
+    @context['products'] = {'count' => 5, 'tags' => ['deepsnow', 'freestyle']}
 
     assert_equal 'deepsnow', @context['products[var].first']
     assert_equal 'freestyle', @context['products[nested.var].last']
   end
 
   def test_hash_notation_only_for_hash_access
-    @context['array'] = [1,2,3,4,5]
+    @context['array'] = [1, 2, 3, 4, 5]
     @context['hash'] = {'first' => 'Hello'}
 
     assert_equal 1, @context['array.first']
@@ -330,7 +331,7 @@ class ContextTest < Test::Unit::TestCase
 
   def test_first_can_appear_in_middle_of_callchain
 
-    @context['product'] = {'variants' => [ {'title' => 'draft151cm'}, {'title' => 'element151cm'}  ]}
+    @context['product'] = {'variants' => [{'title' => 'draft151cm'}, {'title' => 'element151cm'}]}
 
     assert_equal 'draft151cm', @context['product.variants[0].title']
     assert_equal 'element151cm', @context['product.variants[1].title']
@@ -340,55 +341,55 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_cents
-    @context.merge( "cents" => HundredCentes.new )
+    @context.merge("cents" => HundredCentes.new)
     assert_equal 100, @context['cents']
   end
 
   def test_nested_cents
-    @context.merge( "cents" => { 'amount' => HundredCentes.new} )
+    @context.merge("cents" => {'amount' => HundredCentes.new})
     assert_equal 100, @context['cents.amount']
 
-    @context.merge( "cents" => { 'cents' => { 'amount' => HundredCentes.new} } )
+    @context.merge("cents" => {'cents' => {'amount' => HundredCentes.new}})
     assert_equal 100, @context['cents.cents.amount']
   end
 
   def test_cents_through_drop
-    @context.merge( "cents" => CentsDrop.new )
+    @context.merge("cents" => CentsDrop.new)
     assert_equal 100, @context['cents.amount']
   end
 
   def test_nested_cents_through_drop
-    @context.merge( "vars" => {"cents" => CentsDrop.new} )
+    @context.merge("vars" => {"cents" => CentsDrop.new})
     assert_equal 100, @context['vars.cents.amount']
   end
 
   def test_drop_methods_with_question_marks
-    @context.merge( "cents" => CentsDrop.new )
+    @context.merge("cents" => CentsDrop.new)
     assert @context['cents.non_zero?']
   end
 
   def test_context_from_within_drop
-    @context.merge( "test" => '123', "vars" => ContextSensitiveDrop.new )
+    @context.merge("test" => '123', "vars" => ContextSensitiveDrop.new)
     assert_equal '123', @context['vars.test']
   end
 
   def test_nested_context_from_within_drop
-    @context.merge( "test" => '123', "vars" => {"local" => ContextSensitiveDrop.new }  )
+    @context.merge("test" => '123', "vars" => {"local" => ContextSensitiveDrop.new})
     assert_equal '123', @context['vars.local.test']
   end
 
   def test_ranges
-    @context.merge( "test" => '5' )
+    @context.merge("test" => '5')
     assert_equal (1..5), @context['(1..5)']
     assert_equal (1..5), @context['(1..test)']
     assert_equal (5..5), @context['(test..test)']
   end
 
   def test_cents_through_drop_nestedly
-    @context.merge( "cents" => {"cents" => CentsDrop.new} )
+    @context.merge("cents" => {"cents" => CentsDrop.new})
     assert_equal 100, @context['cents.cents.amount']
 
-    @context.merge( "cents" => { "cents" => {"cents" => CentsDrop.new}} )
+    @context.merge("cents" => {"cents" => {"cents" => CentsDrop.new}})
     assert_equal 100, @context['cents.cents.cents.amount']
   end
 
@@ -421,13 +422,13 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_nested_lambda_as_variable
-    @context['dynamic'] = { "lambda" => proc { 'Hello' } }
+    @context['dynamic'] = {"lambda" => proc { 'Hello' }}
 
     assert_equal 'Hello', @context['dynamic.lambda']
   end
 
   def test_array_containing_lambda_as_variable
-    @context['dynamic'] = [1,2, proc { 'Hello' } ,4,5]
+    @context['dynamic'] = [1, 2, proc { 'Hello' }, 4, 5]
 
     assert_equal 'Hello', @context['dynamic[2]']
   end
@@ -443,7 +444,7 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_nested_lambda_is_called_once
-    @context['callcount'] = { "lambda" => proc { @global ||= 0; @global += 1; @global.to_s } }
+    @context['callcount'] = {"lambda" => proc { @global ||= 0; @global += 1; @global.to_s }}
 
     assert_equal '1', @context['callcount.lambda']
     assert_equal '1', @context['callcount.lambda']
@@ -453,7 +454,7 @@ class ContextTest < Test::Unit::TestCase
   end
 
   def test_lambda_in_array_is_called_once
-    @context['callcount'] = [1,2, proc { @global ||= 0; @global += 1; @global.to_s } ,4,5]
+    @context['callcount'] = [1, 2, proc { @global ||= 0; @global += 1; @global.to_s }, 4, 5]
 
     assert_equal '1', @context['callcount[2]']
     assert_equal '1', @context['callcount[2]']

@@ -47,12 +47,12 @@ class VariableTest < Test::Unit::TestCase
     Liquid::Template.register_tag("testtag", Block)
 
     assert_nothing_thrown do
-      template = Liquid::Template.parse( "{% testtag %} {% endtesttag %}")
+      template = Liquid::Template.parse("{% testtag %} {% endtesttag %}")
     end
   end
 
   private
-    def block_types(nodelist)
-      nodelist.collect { |node| node.class }
-    end
+  def block_types(nodelist)
+    nodelist.collect { |node| node.class }
+  end
 end # VariableTest

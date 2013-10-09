@@ -109,7 +109,7 @@ class StatementsTest < Test::Unit::TestCase
   def test_is_not_collection_empty
     text = %| {% if array == empty %} true {% else %} false {% endif %} |
     expected = %|  false  |
-    assert_equal expected, Template.parse(text).render('array' => [1,2,3])
+    assert_equal expected, Template.parse(text).render('array' => [1, 2, 3])
   end
 
   def test_nil
@@ -125,10 +125,10 @@ class StatementsTest < Test::Unit::TestCase
   def test_not_nil
     text = %| {% if var != nil %} true {% else %} false {% endif %} |
     expected = %|  true  |
-    assert_equal expected, Template.parse(text).render('var' => 1 )
+    assert_equal expected, Template.parse(text).render('var' => 1)
 
     text = %| {% if var != null %} true {% else %} false {% endif %} |
     expected = %|  true  |
-    assert_equal expected, Template.parse(text).render('var' => 1 )
+    assert_equal expected, Template.parse(text).render('var' => 1)
   end
 end # StatementsTest

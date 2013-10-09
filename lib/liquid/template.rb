@@ -88,34 +88,34 @@ module Liquid
     #
     def render(*args)
       return '' if @root.nil?
-      
+
       context = case args.first
-      when Liquid::Context
-        args.shift
-      when Hash
-        Context.new([args.shift, assigns], instance_assigns, registers, @rethrow_errors)
-      when nil
-        Context.new(assigns, instance_assigns, registers, @rethrow_errors)
-      else
-        raise ArgumentError, "Expect Hash or Liquid::Context as parameter"
-      end
+                  when Liquid::Context
+                    args.shift
+                  when Hash
+                    Context.new([args.shift, assigns], instance_assigns, registers, @rethrow_errors)
+                  when nil
+                    Context.new(assigns, instance_assigns, registers, @rethrow_errors)
+                  else
+                    raise ArgumentError, "Expect Hash or Liquid::Context as parameter"
+                end
 
       case args.last
-      when Hash
-        options = args.pop
+        when Hash
+          options = args.pop
 
-        if options[:registers].is_a?(Hash)
-          self.registers.merge!(options[:registers])
-        end
+          if options[:registers].is_a?(Hash)
+            self.registers.merge!(options[:registers])
+          end
 
-        if options[:filters]
-          context.add_filters(options[:filters])
-        end
+          if options[:filters]
+            context.add_filters(options[:filters])
+          end
 
-      when Module
-        context.add_filters(args.pop)
-      when Array
-        context.add_filters(args.pop)
+        when Module
+          context.add_filters(args.pop)
+        when Array
+          context.add_filters(args.pop)
       end
 
       begin

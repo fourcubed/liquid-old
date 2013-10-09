@@ -15,8 +15,8 @@ module Liquid
     attr_accessor :filters, :name
 
     def initialize(markup)
-      @markup  = markup
-      @name    = nil
+      @markup = markup
+      @name = nil
       @filters = []
       if match = markup.match(/\s*(#{QuotedFragment})(.*)/)
         @name = match[1]

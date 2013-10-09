@@ -25,7 +25,7 @@ class ThemeRunner
 
       [File.read(test), (File.file?(theme_path) ? File.read(theme_path) : nil), test]
     end.compact
-  end  
+  end
 
 
   def run(profile = false)
@@ -41,20 +41,20 @@ class ThemeRunner
       page_template = File.basename(template_name, File.extname(template_name))
 
       # Profile compiling and rendering both
-      
+
       if profile
 
-        RubyProf.resume do 
-          html = compile_and_render(liquid, layout, assigns, page_template) 
-        end 
+        RubyProf.resume do
+          html = compile_and_render(liquid, layout, assigns, page_template)
+        end
 
       else
-        html = compile_and_render(liquid, layout, assigns, page_template) 
+        html = compile_and_render(liquid, layout, assigns, page_template)
       end
 
       # return the result and the MD5 of the content, this can be used to detect regressions between liquid version
       $stdout.puts "* rendered template %s, content: %s" % [template_name, Digest::MD5.hexdigest(html)] if profile
- 
+
       # Uncomment to dump html files to /tmp so that you can inspect for errors
       # File.open("/tmp/#{File.basename(template_name)}.html", "w+") { |fp| fp <<html}
     end
@@ -62,7 +62,7 @@ class ThemeRunner
     RubyProf.stop if profile
   end
 
-  def compile_and_render(template, layout, assigns, page_template)    
+  def compile_and_render(template, layout, assigns, page_template)
     tmpl = Liquid::Template.new
     tmpl.assigns['page_title'] = 'Page title'
     tmpl.assigns['template'] = page_template
@@ -70,11 +70,11 @@ class ThemeRunner
     content_for_layout = tmpl.parse(template).render(assigns)
 
     if layout
-      assigns['content_for_layout'] = content_for_layout      
+      assigns['content_for_layout'] = content_for_layout
       tmpl.parse(layout).render(assigns)
     else
       content_for_layout
-    end    
+    end
   end
 end
 

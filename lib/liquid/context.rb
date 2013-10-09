@@ -15,13 +15,13 @@ module Liquid
   class Context
     attr_reader :scopes, :errors, :registers, :environments
 
-    def initialize(environments = {}, outer_scope = {}, registers = {}, rethrow_errors = false)
-      @environments   = [environments].flatten
-      @scopes         = [(outer_scope || {})]
-      @registers      = registers
-      @errors         = []
+    def initialize(outer_scope = {}, registers = {}, rethrow_errors = false)
+      @environments = []
+      @scopes = [(outer_scope || {})]
+      @registers = registers
+      @errors = []
       @rethrow_errors = rethrow_errors
-      squash_instance_assigns_with_environments
+      #squash_instance_assigns_with_environments
     end
 
     def strainer
@@ -46,10 +46,10 @@ module Liquid
       raise if @rethrow_errors
 
       case e
-      when SyntaxError
-        "Liquid syntax error: #{e.message}"
-      else
-        "Liquid error: #{e.message}"
+        when SyntaxError
+          "Liquid syntax error: #{e.message}"
+        else
+          "Liquid error: #{e.message}"
       end
     end
 
@@ -111,27 +111,30 @@ module Liquid
     end
 
     private
-      LITERALS = {
+    LITERALS = {
         nil => nil, 'nil' => nil, 'null' => nil, '' => nil,
-        'true'  => true,
+        'true' => true,
         'false' => false,
         'blank' => :blank?,
         'empty' => :empty?
-      }
+    }
 
-      # Look up variable, either resolve directly after considering the name. We can directly handle
-      # Strings, digits, floats and booleans (true,false).
-      # If no match is made we lookup the variable in the current scope and
-      # later move up to the parent blocks to see if we can resolve the variable somewhere up the tree.
-      # Some special keywords return symbols. Those symbols are to be called on the rhs object in expressions
-      #
-      # Example:
-      #   products == empty #=> products.empty?
-      def resolve(key)
-        if LITERALS.key?(key)
-          LITERALS[key]
-        else
-          case key
+    # Look up variable, either resolve directly after considering the name. We can directly handle
+    # Strings, digits, floats and booleans (true,false).
+    # If no match is made we lookup the variable in the current scope and
+    # later move up to the parent blocks to see if we can resolve the variable somewhere up the tree.
+    # Some special keywords return symbols. Those symbols are to be called on the rhs object in expressions
+    #
+    # Example:
+    #   products == empty #=> products.empty?
+    def resolve(key)
+      if LITERALS.key?(key)
+        LITERALS[key]
+      else
+        case key
+          # filtered variables
+          when SpacelessFilter
+            filtered_variable(key)
           when /^'(.*)'$/ # Single quoted strings
             $1
           when /^"(.*)"$/ # Double quoted strings
@@ -144,102 +147,110 @@ module Liquid
             $1.to_f
           else
             variable(key)
+        end
+      end
+    end
+
+    # Fetches an object starting at the local scope and then moving up the hierachy
+    def find_variable(key)
+      scope = @scopes.find { |s| s.has_key?(key) }
+
+      if scope.nil?
+        @environments.each do |e|
+          if variable = lookup_and_evaluate(e, key)
+            scope = e
+            break
           end
         end
       end
 
-      # Fetches an object starting at the local scope and then moving up the hierachy
-      def find_variable(key)
-        scope = @scopes.find { |s| s.has_key?(key) }
+      scope ||= @environments.last || @scopes.last
+      variable ||= lookup_and_evaluate(scope, key)
 
-        if scope.nil?
-          @environments.each do |e|
-            if variable = lookup_and_evaluate(e, key)
-              scope = e
-              break
-            end
-          end
-        end
+      variable = variable.to_liquid
+      variable.context = self if variable.respond_to?(:context=)
 
-        scope     ||= @environments.last || @scopes.last
-        variable  ||= lookup_and_evaluate(scope, key)
+      return variable
+    end
 
-        variable = variable.to_liquid
-        variable.context = self if variable.respond_to?(:context=)
+    # Resolves namespaced queries gracefully.
+    #
+    # Example
+    #  @context['hash'] = {"name" => 'tobi'}
+    #  assert_equal 'tobi', @context['hash.name']
+    #  assert_equal 'tobi', @context['hash["name"]']
+    def variable(markup)
+      parts = markup.scan(VariableParser)
+      square_bracketed = /^\[(.*)\]$/
 
-        return variable
+      first_part = parts.shift
+
+      if first_part =~ square_bracketed
+        first_part = resolve($1)
       end
 
-      # Resolves namespaced queries gracefully.
-      #
-      # Example
-      #  @context['hash'] = {"name" => 'tobi'}
-      #  assert_equal 'tobi', @context['hash.name']
-      #  assert_equal 'tobi', @context['hash["name"]']
-      def variable(markup)
-        parts = markup.scan(VariableParser)
-        square_bracketed = /^\[(.*)\]$/
+      if object = find_variable(first_part)
 
-        first_part = parts.shift
+        parts.each do |part|
+          part = resolve($1) if part_resolved = (part =~ square_bracketed)
 
-        if first_part =~ square_bracketed
-          first_part = resolve($1)
-        end
-
-        if object = find_variable(first_part)
-
-          parts.each do |part|
-            part = resolve($1) if part_resolved = (part =~ square_bracketed)
-
-            # If object is a hash- or array-like object we look for the
-            # presence of the key and if its available we return it
-            if object.respond_to?(:[]) and
+          # If object is a hash- or array-like object we look for the
+          # presence of the key and if its available we return it
+          if object.respond_to?(:[]) and
               ((object.respond_to?(:has_key?) and object.has_key?(part)) or
-               (object.respond_to?(:fetch) and part.is_a?(Integer)))
+                  (object.respond_to?(:fetch) and part.is_a?(Integer)))
 
-              # if its a proc we will replace the entry with the proc
-              res = lookup_and_evaluate(object, part)
-              object = res.to_liquid
+            # if its a proc we will replace the entry with the proc
+            res = lookup_and_evaluate(object, part)
+            object = res.to_liquid
 
-              # Some special cases. If the part wasn't in square brackets and
-              # no key with the same name was found we interpret following calls
-              # as commands and call them on the current object
-            elsif !part_resolved and object.respond_to?(part) and ['size', 'first', 'last'].include?(part)
+            # Some special cases. If the part wasn't in square brackets and
+            # no key with the same name was found we interpret following calls
+            # as commands and call them on the current object
+          elsif !part_resolved and object.respond_to?(part) and ['size', 'first', 'last'].include?(part)
 
-              object = object.send(part.intern).to_liquid
+            object = object.send(part.intern).to_liquid
 
-              # No key was present with the desired value and it wasn't one of the directly supported
-              # keywords either. The only thing we got left is to return nil
-            else
-              return nil
-            end
+            # No key was present with the desired value and it wasn't one of the directly supported
+            # keywords either. The only thing we got left is to return nil
+          else
+            return nil
+          end
 
-            # If we are dealing with a drop here we have to
-            object.context = self if object.respond_to?(:context=)
+          # If we are dealing with a drop here we have to
+          object.context = self if object.respond_to?(:context=)
+        end
+      end
+
+      object
+    end
+
+    def filtered_variable(markup)
+      Variable.new(markup).render(self)
+    end
+
+    # variable
+
+    def lookup_and_evaluate(obj, key)
+      if (value = obj[key]).is_a?(Proc) && obj.respond_to?(:[]=)
+        obj[key] = (value.arity == 0) ? value.call : value.call(self)
+      else
+        value
+      end
+    end
+
+    # lookup_and_evaluate
+
+    def squash_instance_assigns_with_environments
+      @scopes.last.each_key do |k|
+        @environments.each do |env|
+          if env.has_key?(k)
+            scopes.last[k] = lookup_and_evaluate(env, k)
+            break
           end
         end
-
-        object
-      end # variable
-
-      def lookup_and_evaluate(obj, key)
-        if (value = obj[key]).is_a?(Proc) && obj.respond_to?(:[]=)
-          obj[key] = (value.arity == 0) ? value.call : value.call(self)
-        else
-          value
-        end
-      end # lookup_and_evaluate
-
-      def squash_instance_assigns_with_environments
-        @scopes.last.each_key do |k|
-          @environments.each do |env|
-            if env.has_key?(k)
-              scopes.last[k] = lookup_and_evaluate(env, k)
-              break
-            end
-          end
-        end
-      end # squash_instance_assigns_with_environments
+      end
+    end # squash_instance_assigns_with_environments
   end # Context
 
 end # Liquid

@@ -8,14 +8,14 @@ module Liquid
   #
   class Condition #:nodoc:
     @@operators = {
-      '==' => lambda { |cond, left, right|  cond.send(:equal_variables, left, right) },
-      '!=' => lambda { |cond, left, right| !cond.send(:equal_variables, left, right) },
-      '<>' => lambda { |cond, left, right| !cond.send(:equal_variables, left, right) },
-      '<'  => :<,
-      '>'  => :>,
-      '>=' => :>=,
-      '<=' => :<=,
-      'contains' => lambda { |cond, left, right| left && right ? left.include?(right) : false }
+        '==' => lambda { |cond, left, right| cond.send(:equal_variables, left, right) },
+        '!=' => lambda { |cond, left, right| !cond.send(:equal_variables, left, right) },
+        '<>' => lambda { |cond, left, right| !cond.send(:equal_variables, left, right) },
+        '<' => :<,
+        '>' => :>,
+        '>=' => :>=,
+        '<=' => :<=,
+        'contains' => lambda { |cond, left, right| left && right ? left.include?(right) : false }
     }
 
     def self.operators
@@ -27,7 +27,7 @@ module Liquid
 
     def initialize(left = nil, operator = nil, right = nil)
       @left, @operator, @right = left, operator, right
-      @child_relation  = nil
+      @child_relation = nil
       @child_condition = nil
     end
 
@@ -35,12 +35,12 @@ module Liquid
       result = interpret_condition(left, right, operator, context)
 
       case @child_relation
-      when :or
-        result || @child_condition.evaluate(context)
-      when :and
-        result && @child_condition.evaluate(context)
-      else
-        result
+        when :or
+          result || @child_condition.evaluate(context)
+        when :and
+          result && @child_condition.evaluate(context)
+        else
+          result
       end
     end
 
